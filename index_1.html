@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Аналіз бізнес-процесів кіоску шаурми — тестове завдання БА</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --flatbread:#F2E6D2;
+    --paper:#FBF6EB;
+    --charcoal:#241A14;
+    --charcoal-soft:#3A2C22;
+    --chili:#BD3A23;
+    --pickle:#66743D;
+    --foil:#A79C87;
+    --foil-light:#D9CFBB;
+    --max-w:1100px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+
+  body{
+    margin:0;
+    background:var(--flatbread);
+    color:var(--charcoal);
+    font-family:'Golos Text', sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  h1,h2,h3{
+    font-family:'Oswald', sans-serif;
+    margin:0;
+    line-height:1.1;
+    letter-spacing:0.2px;
+  }
+
+  .mono{
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  a{color:var(--chili);}
+
+  .wrap{
+    max-width:var(--max-w);
+    margin:0 auto;
+    padding:0 28px;
+  }
+
+  section{padding:88px 0;}
+
+  .section-title{
+    font-size:2.1rem;
+    font-weight:600;
+    color:var(--charcoal);
+    max-width:640px;
+  }
+
+  .section-lede{
+    max-width:600px;
+    color:var(--charcoal-soft);
+    margin-top:14px;
+    font-size:1.02rem;
+  }
+
+  .rule{
+    border:none;
+    border-top:1.5px dashed var(--foil);
+    margin:0;
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    background:var(--charcoal);
+    color:var(--flatbread);
+    padding:72px 0 64px;
+    position:relative;
+  }
+  .hero .wrap{display:flex; flex-direction:column; gap:34px;}
+  .hero-meta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.8rem;
+    letter-spacing:0.03em;
+    color:var(--foil-light);
+    opacity:0;
+    animation:riseIn 0.7s ease forwards;
+    animation-delay:0.05s;
+  }
+  .hero h1{
+    font-size:3.4rem;
+    font-weight:700;
+    color:var(--flatbread);
+    max-width:820px;
+    opacity:0;
+    animation:riseIn 0.8s ease forwards;
+    animation-delay:0.2s;
+  }
+  .hero .lede{
+    max-width:560px;
+    color:var(--foil-light);
+    font-size:1.08rem;
+    opacity:0;
+    animation:riseIn 0.8s ease forwards;
+    animation-delay:0.4s;
+  }
+  .hero-stat{
+    display:flex;
+    align-items:baseline;
+    gap:16px;
+    border-top:1.5px dashed var(--foil);
+    padding-top:24px;
+    margin-top:8px;
+    opacity:0;
+    animation:riseIn 0.8s ease forwards;
+    animation-delay:0.6s;
+  }
+  .hero-stat .num{
+    font-family:'JetBrains Mono', monospace;
+    font-size:3.2rem;
+    font-weight:700;
+    color:var(--chili);
+  }
+  .hero-stat .label{
+    max-width:340px;
+    font-size:0.92rem;
+    color:var(--foil-light);
+  }
+
+  @keyframes riseIn{
+    from{opacity:0; transform:translateY(14px);}
+    to{opacity:1; transform:translateY(0);}
+  }
+
+  /* ---------- CAPACITY TICKETS ---------- */
+  .tickets{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:1px;
+    background:var(--foil);
+    border:1px solid var(--foil);
+    margin-top:40px;
+  }
+  .ticket{
+    background:var(--paper);
+    padding:26px 24px;
+  }
+  .ticket .k{
+    font-family:'JetBrains Mono', monospace;
+    font-size:1.9rem;
+    font-weight:700;
+    color:var(--chili);
+  }
+  .ticket .k small{
+    font-size:1rem;
+    font-weight:500;
+    color:var(--charcoal-soft);
+  }
+  .ticket .d{
+    margin-top:8px;
+    font-size:0.92rem;
+    color:var(--charcoal-soft);
+  }
+
+  /* ---------- PROCESS ---------- */
+  .process{
+    margin-top:48px;
+    position:relative;
+  }
+  .process::before{
+    content:"";
+    position:absolute;
+    left:23px;
+    top:8px;
+    bottom:8px;
+    width:1.5px;
+    background:repeating-linear-gradient(to bottom, var(--foil) 0 6px, transparent 6px 12px);
+  }
+  .step{
+    position:relative;
+    padding:0 0 40px 64px;
+  }
+  .step:last-child{padding-bottom:0;}
+  .step .no{
+    position:absolute;
+    left:0; top:-2px;
+    width:48px; height:48px;
+    border-radius:50%;
+    background:var(--charcoal);
+    color:var(--flatbread);
+    font-family:'JetBrains Mono', monospace;
+    font-weight:600;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.05rem;
+  }
+  .step h3{
+    font-size:1.15rem;
+    font-weight:500;
+    color:var(--charcoal);
+  }
+  .step p{
+    margin:6px 0 0;
+    color:var(--charcoal-soft);
+    max-width:560px;
+    font-size:0.98rem;
+  }
+  .step .tag{
+    display:inline-block;
+    margin-top:10px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:var(--pickle);
+    border:1px solid var(--pickle);
+    padding:3px 9px;
+  }
+
+  .miro-link{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    margin-top:36px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.88rem;
+    color:var(--charcoal);
+    text-decoration:none;
+    border-bottom:1.5px solid var(--chili);
+    padding-bottom:2px;
+  }
+  .miro-link:hover{color:var(--chili);}
+
+  /* ---------- ASSUMPTIONS ---------- */
+  .assumptions{
+    display:grid;
+    grid-template-columns:repeat(4, 1fr);
+    gap:1px;
+    background:var(--foil);
+    border:1px solid var(--foil);
+    margin-top:40px;
+  }
+  .assumptions .cell{
+    background:var(--paper);
+    padding:22px 18px;
+  }
+  .assumptions .cell .v{
+    font-family:'JetBrains Mono', monospace;
+    font-size:1.5rem;
+    font-weight:700;
+  }
+  .assumptions .cell .l{
+    margin-top:6px;
+    font-size:0.82rem;
+    color:var(--charcoal-soft);
+  }
+  .scenario-strip{
+    margin-top:20px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  .scenario-pill{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.82rem;
+    padding:8px 14px;
+    border:1px solid var(--foil);
+    color:var(--charcoal-soft);
+  }
+
+  /* ---------- RECEIPTS (financial scenarios) ---------- */
+  .receipts{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:22px;
+    margin-top:44px;
+  }
+  .receipt{
+    background:var(--paper);
+    border:1px solid var(--foil);
+    padding:26px 22px 22px;
+    position:relative;
+  }
+  .receipt.mid{border-color:var(--pickle); border-width:1.5px;}
+  .receipt .r-head{
+    font-size:1.05rem;
+    font-weight:600;
+    font-family:'Oswald', sans-serif;
+  }
+  .receipt .r-sub{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:var(--charcoal-soft);
+    margin-top:4px;
+  }
+  .receipt .line{
+    display:flex;
+    justify-content:space-between;
+    gap:8px;
+    padding:10px 0;
+    border-top:1px dashed var(--foil);
+    font-size:0.88rem;
+  }
+  .receipt .line span:first-child{color:var(--charcoal-soft);}
+  .receipt .line span:last-child{
+    font-family:'JetBrains Mono', monospace;
+    text-align:right;
+    white-space:nowrap;
+  }
+  .receipt .line.total{
+    border-top:1.5px solid var(--charcoal);
+    margin-top:4px;
+    font-weight:600;
+  }
+  .receipt .result{
+    margin-top:16px;
+    padding-top:14px;
+    border-top:1.5px dashed var(--foil);
+  }
+  .receipt .result .rv{
+    font-family:'JetBrains Mono', monospace;
+    font-size:1.3rem;
+    font-weight:700;
+  }
+  .receipt.low .result .rv{color:var(--chili);}
+  .receipt.mid .result .rv{color:var(--pickle);}
+  .receipt.high .result .rv{color:var(--pickle);}
+  .receipt .result .rl{
+    font-size:0.78rem;
+    color:var(--charcoal-soft);
+    margin-top:2px;
+  }
+
+  /* fixed cost breakdown */
+  .fixed-list{
+    margin-top:44px;
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:0 40px;
+    max-width:760px;
+  }
+  .fixed-list .fi{
+    display:flex;
+    justify-content:space-between;
+    padding:11px 0;
+    border-bottom:1px dashed var(--foil);
+    font-size:0.92rem;
+    gap:12px;
+  }
+  .fixed-list .fi span:last-child{
+    font-family:'JetBrains Mono', monospace;
+    white-space:nowrap;
+    color:var(--charcoal-soft);
+  }
+  .fixed-total{
+    margin-top:18px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.95rem;
+    font-weight:600;
+  }
+
+  /* ---------- RANGE CHART ---------- */
+  .chart-card{
+    margin-top:44px;
+    background:var(--paper);
+    border:1px solid var(--foil);
+    padding:36px 32px 30px;
+  }
+  .chart-row{
+    display:grid;
+    grid-template-columns:150px 1fr;
+    align-items:center;
+    gap:18px;
+    margin-bottom:26px;
+  }
+  .chart-row .rname{
+    font-size:0.92rem;
+    font-weight:600;
+  }
+  .chart-row .rsub{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    color:var(--charcoal-soft);
+    font-weight:400;
+    margin-top:3px;
+  }
+  .track{
+    position:relative;
+    height:26px;
+    background:var(--flatbread);
+    border:1px solid var(--foil-light);
+  }
+  .bar{
+    position:absolute;
+    top:0; bottom:0;
+    background:var(--chili);
+    transform:scaleX(0);
+    transform-origin:left;
+    transition:transform 1s cubic-bezier(.2,.8,.2,1);
+  }
+  .bar.positive{background:var(--pickle);}
+  .bar.revealed{transform:scaleX(1);}
+  .zero-line{
+    position:absolute;
+    top:-6px; bottom:-6px;
+    width:2px;
+    background:var(--charcoal);
+  }
+  .zero-line::after{
+    content:"0 грн";
+    position:absolute;
+    top:-22px;
+    left:50%;
+    transform:translateX(-50%);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.7rem;
+    color:var(--charcoal-soft);
+    white-space:nowrap;
+  }
+  .axis{
+    position:relative;
+    height:18px;
+    margin-top:6px;
+    margin-left:168px;
+  }
+  .axis span{
+    position:absolute;
+    transform:translateX(-50%);
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.7rem;
+    color:var(--foil);
+  }
+  .breakeven-note{
+    margin-top:30px;
+    padding-top:20px;
+    border-top:1.5px dashed var(--foil);
+    font-size:0.92rem;
+    color:var(--charcoal-soft);
+    max-width:560px;
+  }
+  .breakeven-note b{color:var(--charcoal); font-weight:600;}
+
+  /* ---------- CONCLUSIONS ---------- */
+  .conclusion-list{
+    margin-top:36px;
+    display:flex;
+    flex-direction:column;
+    gap:0;
+    max-width:700px;
+  }
+  .conclusion-list li{
+    list-style:none;
+    padding:16px 0;
+    border-bottom:1px dashed var(--foil);
+    display:flex;
+    gap:16px;
+    font-size:0.98rem;
+  }
+  .conclusion-list li .mk{
+    font-family:'JetBrains Mono', monospace;
+    color:var(--chili);
+    font-weight:700;
+    flex-shrink:0;
+  }
+  .weak-points{
+    margin-top:44px;
+  }
+  .weak-points h3{
+    font-size:1.1rem;
+    font-weight:600;
+    color:var(--chili);
+  }
+  .weak-points ul{
+    margin:14px 0 0;
+    padding:0;
+    max-width:640px;
+  }
+  .weak-points li{
+    list-style:none;
+    padding:10px 0 10px 20px;
+    border-left:2px solid var(--chili);
+    margin-bottom:8px;
+    font-size:0.95rem;
+    color:var(--charcoal-soft);
+    background:var(--paper);
+    padding-top:12px; padding-bottom:12px; padding-right:14px;
+  }
+
+  /* ---------- RECOMMENDATIONS ---------- */
+  .rec-grid{
+    margin-top:44px;
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+  }
+  .rec-card{
+    background:var(--paper);
+    border:1px solid var(--foil);
+    padding:26px 22px;
+  }
+  .rec-card .rc-tag{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.75rem;
+    color:var(--pickle);
+    text-transform:none;
+  }
+  .rec-card h3{
+    margin-top:10px;
+    font-size:1.15rem;
+    font-weight:500;
+  }
+  .rec-card p{
+    margin-top:10px;
+    font-size:0.92rem;
+    color:var(--charcoal-soft);
+  }
+  .approach-note{
+    margin-top:40px;
+    background:var(--charcoal);
+    color:var(--flatbread);
+    padding:30px 30px;
+    max-width:760px;
+  }
+  .approach-note h3{
+    color:var(--flatbread);
+    font-size:1.05rem;
+    font-weight:500;
+  }
+  .approach-note ol{
+    margin:16px 0 0;
+    padding-left:20px;
+    color:var(--foil-light);
+    font-size:0.94rem;
+  }
+  .approach-note li{margin-bottom:8px;}
+
+  /* ---------- FOOTER ---------- */
+  footer{
+    padding:44px 0 60px;
+    border-top:1.5px dashed var(--foil);
+  }
+  footer .wrap{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    flex-wrap:wrap;
+    gap:16px;
+  }
+  footer .f-title{
+    font-family:'Oswald', sans-serif;
+    font-size:1rem;
+    font-weight:600;
+  }
+  footer .f-meta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    color:var(--foil);
+  }
+
+  @media (max-width:820px){
+    .hero h1{font-size:2.3rem;}
+    .hero-stat .num{font-size:2.4rem;}
+    .tickets{grid-template-columns:1fr;}
+    .assumptions{grid-template-columns:repeat(2,1fr);}
+    .receipts{grid-template-columns:1fr;}
+    .fixed-list{grid-template-columns:1fr;}
+    .rec-grid{grid-template-columns:1fr;}
+    .chart-row{grid-template-columns:1fr; gap:8px;}
+    .axis{margin-left:0;}
+    section{padding:56px 0;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.01ms !important; animation-iteration-count:1 !important; transition-duration:0.01ms !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-meta">ТЕСТОВЕ ЗАВДАННЯ&nbsp;·&nbsp;БІЗНЕС-АНАЛІТИК&nbsp;·&nbsp;КАЛІНІН В.В.</div>
+    <h1>Кіоск шаурми живе на телефонних дзвінках — і це його головна проблема</h1>
+    <p class="lede">Тільки доставка, живого вікна немає, клієнтів мало. Власник найняв аналітика, щоб зрозуміти, де бізнес втрачає гроші і що з цим робити.</p>
+    <div class="hero-stat">
+      <div class="num">+87%</div>
+      <div class="label">потенційне зростання виручки при переході від низького сценарію (40 порцій/день) до оптимістичного (75 порцій/день)</div>
+    </div>
+  </div>
+</header>
+
+<section id="intro">
+  <div class="wrap">
+    <h2 class="section-title">Хто і що робить</h2>
+    <p class="section-lede">Замовлення приймає особисто власник по телефону. У процесі задіяні дві команди — кухня та доставка, кожна працює з великим запасом потужності відносно реального навантаження.</p>
+
+    <div class="tickets">
+      <div class="ticket">
+        <div class="k">2 <small>кухарі</small></div>
+        <div class="d">Пропускна здатність — 20 шт шаурми за годину</div>
+      </div>
+      <div class="ticket">
+        <div class="k">30 <small>шт/год</small></div>
+        <div class="d">1 авто доставки, возить по 10–15 шт за поїздку</div>
+      </div>
+      <div class="ticket">
+        <div class="k">1 <small>канал</small></div>
+        <div class="d">Усі замовлення власник приймає особисто телефоном</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="process">
+  <div class="wrap">
+    <h2 class="section-title">Поточний процес обробки замовлення</h2>
+    <p class="section-lede">Від дзвінка клієнта до оплати замовлення проходить шість кроків, і на кожному з них — власник або людина, а не система.</p>
+
+    <div class="process">
+      <div class="step">
+        <div class="no">1</div>
+        <h3>Отримання замовлення</h3>
+        <p>Дзвінок від клієнта напряму власнику бізнесу.</p>
+      </div>
+      <div class="step">
+        <div class="no">2</div>
+        <h3>Обробка інформації власником</h3>
+        <p>Фіксується продукція, адреса доставки, час, вартість замовлення і коментарі клієнта — за наявності.</p>
+      </div>
+      <div class="step">
+        <div class="no">3</div>
+        <h3>Фіксація замовлення</h3>
+        <p>Створюється ордер для кухарів на основі отриманої інформації.</p>
+      </div>
+      <div class="step">
+        <div class="no">4</div>
+        <h3>Приготування та пакування</h3>
+        <p>Кухар готує замовлення і пакує його разом з інформацією для кур'єра.</p>
+        <span class="tag">20 шт/год на 2 кухарів</span>
+      </div>
+      <div class="step">
+        <div class="no">5</div>
+        <h3>Передача кур'єру</h3>
+        <p>Кур'єр забирає готове замовлення для доставки.</p>
+        <span class="tag">30 шт/год, 10–15 за поїздку</span>
+      </div>
+      <div class="step">
+        <div class="no">6</div>
+        <h3>Доставка та розрахунок</h3>
+        <p>Кур'єр передає замовлення клієнту, клієнт розраховується згідно свого замовлення.</p>
+      </div>
+    </div>
+
+    <a class="miro-link" href="https://miro.com/app/board/uXjVHoUzKAM=/?share_link_id=764328927669" target="_blank" rel="noopener">Повна BPMN-модель процесу в Miro →</a>
+  </div>
+</section>
+
+<section id="assumptions">
+  <div class="wrap">
+    <h2 class="section-title">Базові припущення для розрахунку</h2>
+    <p class="section-lede">Фінансова модель побудована на трьох сценаріях завантаження — від обережного до оптимістичного.</p>
+
+    <div class="assumptions">
+      <div class="cell">
+        <div class="v">180 грн</div>
+        <div class="l">середня ціна порції</div>
+      </div>
+      <div class="cell">
+        <div class="v">80 грн</div>
+        <div class="l">собівартість з упаковкою</div>
+      </div>
+      <div class="cell">
+        <div class="v">26</div>
+        <div class="l">робочих днів на місяць</div>
+      </div>
+      <div class="cell">
+        <div class="v">105–110 тис</div>
+        <div class="l">постійні витрати в середньому</div>
+      </div>
+    </div>
+
+    <div class="scenario-strip">
+      <div class="scenario-pill">низький — 40 порцій/день</div>
+      <div class="scenario-pill">середній — 55 порцій/день</div>
+      <div class="scenario-pill">оптимістичний — 75 порцій/день</div>
+    </div>
+
+    <div class="fixed-list">
+      <div class="fi"><span>Оренда кіоску / кухні</span><span>5–8 тис грн</span></div>
+      <div class="fi"><span>Комунальні платежі</span><span>3,5–5,5 тис грн</span></div>
+      <div class="fi"><span>Інтернет і зв'язок</span><span>500–700 грн</span></div>
+      <div class="fi"><span>ЗП двох кухарів</span><span>44–50 тис грн</span></div>
+      <div class="fi"><span>ЗП кур'єра</span><span>28–33 тис грн</span></div>
+      <div class="fi"><span>Паливо й амортизація авто</span><span>7–11 тис грн</span></div>
+      <div class="fi"><span>Реклама</span><span>3–6 тис грн</span></div>
+      <div class="fi"><span>Інші дрібні витрати</span><span>2–3 тис грн</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="financials">
+  <div class="wrap">
+    <h2 class="section-title">Три сценарії, три результати</h2>
+    <p class="section-lede">Виручка рахується від кількості порцій на місяць, витрати на продукти — прямо пропорційно обсягу, постійні витрати змінюються слабо.</p>
+
+    <div class="receipts">
+      <div class="receipt low">
+        <div class="r-head">Низький сценарій</div>
+        <div class="r-sub">40 порцій/день · 1 040/міс</div>
+        <div class="line"><span>Виручка</span><span>187 200 грн</span></div>
+        <div class="line"><span>Витрати на продукти</span><span>−83 200 грн</span></div>
+        <div class="line total"><span>Постійні + податки</span><span>≈ −118 000 грн</span></div>
+        <div class="result">
+          <div class="rv">−14 000 … 0 грн</div>
+          <div class="rl">чистий результат за місяць</div>
+        </div>
+      </div>
+
+      <div class="receipt mid">
+        <div class="r-head">Середній сценарій</div>
+        <div class="r-sub">55 порцій/день · 1 430/міс</div>
+        <div class="line"><span>Виручка</span><span>257 400 грн</span></div>
+        <div class="line"><span>Витрати на продукти</span><span>−114 400 грн</span></div>
+        <div class="line total"><span>Постійні + податки</span><span>≈ −122 500 грн</span></div>
+        <div class="result">
+          <div class="rv">15 000–25 000 грн</div>
+          <div class="rl">чистий прибуток за місяць</div>
+        </div>
+      </div>
+
+      <div class="receipt high">
+        <div class="r-head">Оптимістичний сценарій</div>
+        <div class="r-sub">75 порцій/день · 1 950/міс</div>
+        <div class="line"><span>Виручка</span><span>351 000 грн</span></div>
+        <div class="line"><span>Витрати на продукти</span><span>−156 000 грн</span></div>
+        <div class="line total"><span>Постійні + податки</span><span>≈ −133 500 грн</span></div>
+        <div class="result">
+          <div class="rv">50 000–65 000 грн</div>
+          <div class="rl">чистий прибуток за місяць</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="chart-card">
+      <div class="chart-row">
+        <div class="rname">Низький<span class="rsub">40/день</span></div>
+        <div class="track" data-min="6.7" data-max="22.2"><div class="bar" id="bar-low"></div><div class="zero-line" style="left:22.2%"></div></div>
+      </div>
+      <div class="chart-row">
+        <div class="rname">Середній<span class="rsub">55/день</span></div>
+        <div class="track" data-min="38.9" data-max="50"><div class="bar positive" id="bar-mid"></div></div>
+      </div>
+      <div class="chart-row">
+        <div class="rname">Оптимістичний<span class="rsub">75/день</span></div>
+        <div class="track" data-min="77.8" data-max="94.4"><div class="bar positive" id="bar-high"></div></div>
+      </div>
+      <div class="axis">
+        <span style="left:0%">−20 тис</span>
+        <span style="left:22.2%">0</span>
+        <span style="left:44.4%">20 тис</span>
+        <span style="left:66.7%">40 тис</span>
+        <span style="left:88.9%">60 тис</span>
+      </div>
+      <div class="breakeven-note">Точка беззбитковості знаходиться приблизно на рівні <b>48–52 порцій на день</b> — саме там нижня межа низького сценарію впирається в нульову лінію.</div>
+    </div>
+  </div>
+</section>
+
+<section id="conclusions">
+  <div class="wrap">
+    <h2 class="section-title">Короткі висновки</h2>
+
+    <ul class="conclusion-list">
+      <li><span class="mk">01</span><span>На обсягах до 45 порцій на день бізнес працює майже в нуль або з невеликим мінусом.</span></li>
+      <li><span class="mk">02</span><span>Точка беззбитковості — приблизно 48–52 порції на день.</span></li>
+      <li><span class="mk">03</span><span>При 55–60 порціях з'являється стабільний прибуток 15–25 тис грн на місяць.</span></li>
+      <li><span class="mk">04</span><span>При 70 і більше порціях чистий прибуток може сягати 50 тис грн і вище.</span></li>
+    </ul>
+
+    <div class="weak-points">
+      <h3>Головні слабкі місця поточної моделі</h3>
+      <ul>
+        <li>Залежність тільки від телефонних замовлень — весь потік проходить через одну людину.</li>
+        <li>Низьке завантаження кухні відносно наявної потужності в 20 шт/год.</li>
+        <li>Висока частка постійних витрат — переважно зарплати та утримання авто.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="recommendations">
+  <div class="wrap">
+    <h2 class="section-title">Що можна змінити</h2>
+    <p class="section-lede">Три напрямки, які не вимагають розширення штату чи кухні — лише кращого використання того, що вже є.</p>
+
+    <div class="rec-grid">
+      <div class="rec-card">
+        <div class="rc-tag">Логістика</div>
+        <h3>Довантажити авто</h3>
+        <p>Третина потужності машини доставки не використовується. Підключення сервісів на кшталт Glovo чи Bolt Food дозволить забирати додаткові замовлення без нового кур'єра.</p>
+      </div>
+      <div class="rec-card">
+        <div class="rc-tag">Меню</div>
+        <h3>Завантажити кухню</h3>
+        <p>Додати позиції, які готуються паралельно з шаурмою — наприклад картоплю фрі. Це піднімає середній чек і використовує вільну потужність кухарів.</p>
+      </div>
+      <div class="rec-card">
+        <div class="rc-tag">Автоматизація</div>
+        <h3>Прибрати власника з приймання дзвінків</h3>
+        <p>Перехід на систему POSTER виключає власника з процесу обробки замовлень і дає чіткий облік продажів замість ручних записів.</p>
+      </div>
+    </div>
+
+    <div class="approach-note">
+      <h3>Запропонований підхід</h3>
+      <ol>
+        <li>Проаналізувати поточний стан: орієнтовні доходи, видатки та фактичну завантаженість виробничих потужностей.</li>
+        <li>Впровадити покращення — логістику, меню та автоматизацію прийому замовлень.</li>
+        <li>Показати орієнтовний відсоток росту доходу в презентації чи діаграмах для власника.</li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>
+      <div class="f-title">Аналіз бізнес-процесів кіоску шаурми</div>
+      <div class="f-meta">Тестове завдання БА — Калінін В.В.</div>
+    </div>
+    <a class="miro-link" href="https://miro.com/app/board/uXjVHoUzKAM=/?share_link_id=764328927669" target="_blank" rel="noopener">BPMN-модель у Miro →</a>
+  </div>
+</footer>
+
+<script>
+  const bars = [
+    {id:'bar-low', min:6.7, max:22.2},
+    {id:'bar-mid', min:38.9, max:50},
+    {id:'bar-high', min:77.8, max:94.4}
+  ];
+  bars.forEach(b=>{
+    const el = document.getElementById(b.id);
+    el.style.left = b.min + '%';
+    el.style.width = (b.max - b.min) + '%';
+  });
+
+  const observer = new IntersectionObserver((entries)=>{
+    entries.forEach(entry=>{
+      if(entry.isIntersecting){
+        entry.target.classList.add('revealed');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, {threshold:0.4});
+
+  document.querySelectorAll('.bar').forEach(b=>observer.observe(b));
+</script>
+
+</body>
+</html>
